@@ -37,10 +37,6 @@
                 image(img, 0, 0, width, height);
             }
             fill(0);
-            textSize(16);
-            textAlign(CENTER);
-            text(`Label: ${label}`, width / 2, height - 24);
-            text(`Confidence: ${nf(confidence * 100, 0, 2)}%`, width / 2, height - 4);
         }
 
         function handleImage() {
