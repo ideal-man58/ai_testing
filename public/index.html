@@ -66,7 +66,26 @@
                 label = results[0].label;
                 classifyImage();
                 resultPrinted = true; // 결과를 출력한 후 플래그 설정
+
+                // 서버로 결과 전송
+                sendResultToServer(label);
             }
+        }
+
+        function sendResultToServer(result) {
+            const url = 'http://localhost:3000/upload-result';
+
+            // 결과를 서버로 전송
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ result }),
+            })
+                .then(response => response.json())
+                .then(data => console.log('Server response:', data))
+                .catch(error => console.error('Error:', error));
         }
     </script>
 

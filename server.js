@@ -1,31 +1,30 @@
-// server.js 파일 생성
-
 const express = require('express');
-const multer  = require('multer');
-const path = require('path');
-
+const cors = require('cors');
 const app = express();
 const port = 3000;
 
-// 이미지 업로드를 위한 Multer 설정
-const storage = multer.memoryStorage(); // 이미지를 메모리에 저장
-const upload = multer({ storage: storage });
+app.use(cors());
+app.use(express.json());
 
-// 정적 파일 제공 (웹 페이지 및 이미지에 접근하기 위해)
-app.use(express.static('public'));
+let lastResult = null; // 가장 최근의 결과를 저장하는 변수
 
-// 업로드된 이미지를 분류하고 결과를 반환하는 엔드포인트
-app.post('/upload-image', upload.single('image'), (req, res) => {
-    // req.file.buffer에 업로드된 이미지의 데이터가 있음
-    // 이 데이터를 Teachable Machine 모델에 전달하여 결과를 얻어옴
+app.post('/upload-image', (req, res) => {
+    const { image } = req.body;
+    console.log('Received image:', image);
 
-    // 여기에 Teachable Machine 모델을 호출하고 결과를 얻는 코드를 추가
+    // 이미지를 처리하고 결과를 얻는 작업 수행
+    // 예제: 결과를 저장
+    lastResult = 'classification result';
 
-    // 결과를 클라이언트에 반환
-    res.json({ result: 'classification result' });
+    res.json({ success: true });
 });
 
-// 서버 시작
+app.get('/get-last-result', (req, res) => {
+    // 최근 결과를 클라이언트에 반환
+    res.json({ result: lastResult });
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
+
