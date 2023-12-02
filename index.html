@@ -7,7 +7,7 @@
 </head>
 <body>
     <div>
-        Teachable Machine 이미지 모델 - p5.js와 ml5.js
+        Teachable Machine 이미지 분류
         <input type="file" id="imageUpload" accept="image/*" />
       </div>
       <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
@@ -31,8 +31,6 @@
         }
       
         function setup() {
-          createCanvas(320, 260);
-          
           // 이미지 업로드
           let imageUpload = select('#imageUpload');
           imageUpload.changed(handleImage);
@@ -66,14 +64,17 @@
       
         // 결과를 받았을 때 실행되는 함수
         function gotResult(error, results) {
-          // 에러가 있는 경우
-          if (error) {
+        // If there is an error
+        if (error) {
             console.error(error);
             return;
-          }
-          // 결과는 신뢰도에 따라 배열로 정렬됩니다.
-          // console.log(results[0]);
-          label = results[0].label;
+        }
+        // Log the results to the console
+        console.log(results);
+        // The results are in an array ordered by confidence.
+        label = results[0].label;
+        // Classify again!
+        classifyImage();
         }
       </script>
       
