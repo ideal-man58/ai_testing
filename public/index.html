@@ -48,7 +48,7 @@
         function classifyImage() {
             if (img) {
                 // 이미지 크기를 모델의 기대 크기로 조정
-                img.resize(224, 224);
+                img.resize(224, 224).convert('RGB');;
                 classifier.classify(img, gotResult);
             }
         }
