@@ -6,65 +6,76 @@
     <title>Document</title>
 </head>
 <body>
-    <div>Teachable Machine Image Model</div>
-<button type="button" onclick="init()">Start</button>
-<div id="webcam-container"></div>
-<div id="label-container"></div>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-<script type="text/javascript">
-    // More API functions here:
-    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
-
-    // the link to your model provided by Teachable Machine export panel
-    const URL = "./my_model/";
-
-    let model, webcam, labelContainer, maxPredictions;
-
-    // Load the image model and setup the webcam
-    async function init() {
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
-
-        // load the model and metadata
-        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
-        // or files from your local hard drive
-        // Note: the pose library adds "tmImage" object to your window (window.tmImage)
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
-
-        // Convenience function to setup a webcam
-        const flip = true; // whether to flip the webcam
-        webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
-        await webcam.setup(); // request access to the webcam
-        await webcam.play();
-        window.requestAnimationFrame(loop);
-
-        // append elements to the DOM
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-        labelContainer = document.getElementById("label-container");
-        for (let i = 0; i < maxPredictions; i++) { // and class labels
-            labelContainer.appendChild(document.createElement("div"));
+    <div>
+        Teachable Machine 이미지 모델 - p5.js와 ml5.js
+        <input type="file" id="imageUpload" accept="image/*" />
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
+      <script type="text/javascript">
+        // 분류기 변수
+        let classifier;
+        // 모델 URL
+        let imageModelURL = './my_model/';
+        
+        // 이미지
+        let img;
+        
+        // 분류 결과를 저장하는 변수
+        let label = "";
+      
+        // 먼저 모델을 불러옵니다
+        function preload() {
+          classifier = ml5.imageClassifier(imageModelURL + 'model.json');
         }
-    }
-
-    async function loop() {
-        webcam.update(); // update the webcam frame
-        await predict();
-        window.requestAnimationFrame(loop);
-    }
-
-    // run the webcam image through the image model
-    async function predict() {
-        // predict can take in an image, video or canvas html element
-        const prediction = await model.predict(webcam.canvas);
-        for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction =
-                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-            labelContainer.childNodes[i].innerHTML = classPrediction;
+      
+        function setup() {
+          createCanvas(320, 260);
+          
+          // 이미지 업로드
+          let imageUpload = select('#imageUpload');
+          imageUpload.changed(handleImage);
         }
-    }
-</script>
-
+      
+        function draw() {
+          background(0);
+          // 이미지 그리기
+          if (img) {
+            image(img, 0, 0, width, height);
+          }
+      
+          // 라벨 그리기
+          fill(255);
+          textSize(16);
+          textAlign(CENTER);
+          text(label, width / 2, height - 4);
+        }
+      
+        // 이미지 업로드 처리
+        function handleImage() {
+          img = loadImage(URL.createObjectURL(imageUpload.elt.files[0]), classifyImage);
+        }
+      
+        // 현재 이미지에 대한 예측 얻기
+        function classifyImage() {
+          if (img) {
+            classifier.classify(img, gotResult);
+          }
+        }
+      
+        // 결과를 받았을 때 실행되는 함수
+        function gotResult(error, results) {
+          // 에러가 있는 경우
+          if (error) {
+            console.error(error);
+            return;
+          }
+          // 결과는 신뢰도에 따라 배열로 정렬됩니다.
+          // console.log(results[0]);
+          label = results[0].label;
+        }
+      </script>
+      
 </body>
 </html>
