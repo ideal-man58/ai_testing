@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
+
     <script type="text/javascript">
         let classifier;
         let imageModelURL = './my_model/';
@@ -41,7 +42,7 @@
         }
 
         function handleImage() {
-            img = loadImage(URL.createObjectURL(imageUpload.elt.files[0]), classifyImage);
+            img = loadImage(URL.createObjectURL(select('#imageUpload').elt.files[0]), classifyImage);
         }
 
         function classifyImage() {
@@ -52,15 +53,22 @@
             }
         }
 
+        let resultPrinted = false; // 결과를 한 번만 출력하기 위한 플래그
+
         function gotResult(error, results) {
             if (error) {
                 console.error(error);
                 return;
             }
-            console.log(results);
-            label = results[0].label;
-            classifyImage();
+
+            if (!resultPrinted) {
+                console.log(results);
+                label = results[0].label;
+                classifyImage();
+                resultPrinted = true; // 결과를 출력한 후 플래그 설정
+            }
         }
     </script>
+
 </body>
 </html>
