@@ -3,80 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Teachable Machine Image Classifier</title>
 </head>
 <body>
     <div>
-        Teachable Machine 이미지 분류
+        Teachable Machine Image Classifier
         <input type="file" id="imageUpload" accept="image/*" />
-      </div>
-      <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
-      <script type="text/javascript">
-        // 분류기 변수
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
+    <script type="text/javascript">
         let classifier;
-        // 모델 URL
         let imageModelURL = './my_model/';
-        
-        // 이미지
         let img;
-        
-        // 분류 결과를 저장하는 변수
         let label = "";
-      
-        // 먼저 모델을 불러옵니다
+
         function preload() {
-          classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+            classifier = ml5.imageClassifier(imageModelURL + 'model.json');
         }
-      
+
         function setup() {
-          // 이미지 업로드
-          let imageUpload = select('#imageUpload');
-          imageUpload.changed(handleImage);
+            createCanvas(224, 224); // 이미지 크기 조정
+            let imageUpload = select('#imageUpload');
+            imageUpload.changed(handleImage);
         }
-      
+
         function draw() {
-          background(0);
-          // 이미지 그리기
-          if (img) {
-            image(img, 0, 0, width, height);
-          }
-      
-          // 라벨 그리기
-          fill(255);
-          textSize(16);
-          textAlign(CENTER);
-          text(label, width / 2, height - 4);
+            background(255); // 흰 배경으로 설정
+            if (img) {
+                image(img, 0, 0, width, height);
+            }
+            fill(0);
+            textSize(16);
+            textAlign(CENTER);
+            text(label, width / 2, height - 4);
         }
-      
-        // 이미지 업로드 처리
+
         function handleImage() {
-          img = loadImage(URL.createObjectURL(imageUpload.elt.files[0]), classifyImage);
+            img = loadImage(URL.createObjectURL(imageUpload.elt.files[0]), classifyImage);
         }
-      
-        // 현재 이미지에 대한 예측 얻기
+
         function classifyImage() {
-          if (img) {
-            classifier.classify(img, gotResult);
-          }
+            if (img) {
+                // 이미지 크기를 모델의 기대 크기로 조정
+                img.resize(224, 224);
+                classifier.classify(img, gotResult);
+            }
         }
-      
-        // 결과를 받았을 때 실행되는 함수
+
         function gotResult(error, results) {
-        // If there is an error
-        if (error) {
-            console.error(error);
-            return;
+            if (error) {
+                console.error(error);
+                return;
+            }
+            console.log(results);
+            label = results[0].label;
+            classifyImage();
         }
-        // Log the results to the console
-        console.log(results);
-        // The results are in an array ordered by confidence.
-        label = results[0].label;
-        // Classify again!
-        classifyImage();
-        }
-      </script>
-      
+    </script>
 </body>
 </html>
