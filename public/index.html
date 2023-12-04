@@ -8,11 +8,11 @@
 <body>
     <div>
         Teachable Machine Image Classifier
-        <!-- 파일 선택과 업로드 버튼 추가 -->
-        <input type="file" id="imageUpload" accept="image/*" />
-        <button onclick="handleImage()">Upload Image</button>
+        <!-- 이미지 업로드를 위한 버튼 -->
+        <input type="file" id="imageUpload" accept="image/*" onchange="handleImage()">
     </div>
     <div id="resultDisplay"></div> <!-- 결과를 출력할 요소에 id 추가 -->
+    <button onclick="postResult()">Post Result</button> <!-- 결과를 서버로 POST하는 버튼 추가 -->
     <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
@@ -71,6 +71,31 @@
 
             // 결과를 id가 'resultDisplay'인 요소에 출력
             document.getElementById('resultDisplay').innerHTML = `Label: ${label}<br>Confidence: ${nf(confidence * 100, 0, 2)}%`;
+        }
+
+        // 결과를 서버로 POST하는 함수
+        function postResult() {
+            // 결과 데이터
+            let resultData = {
+                label: label,
+                confidence: confidence
+            };
+
+            // fetch를 사용하여 서버로 POST 요청
+            fetch('/post-result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(resultData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server Response:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
     </script>
 </body>
