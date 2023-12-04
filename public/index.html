@@ -17,11 +17,12 @@
 
     <script type="text/javascript">
         let classifier;
+        let imageModelURL = './my_model/';
         let img;
         let label = "";
 
         function preload() {
-            classifier = ml5.imageClassifier('./my_model/model.json');
+            classifier = ml5.imageClassifier(imageModelURL + 'model.json');
         }
 
         function setup() {
@@ -50,20 +51,7 @@
             }
         }
 
-        function sendResultToServer(result) {
-            fetch('http://localhost:5001/process_result', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(result)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(error => console.error('Error:', error));
-        }
+        let resultPrinted = false; // 결과를 한 번만 출력하기 위한 플래그
 
         function gotResult(error, results) {
             if (error) {
@@ -71,16 +59,19 @@
                 return;
             }
 
-            console.log(results);
-            label = results[0].label;
-            confidence = results[0].confidence;
+            if (!resultPrinted) {
+                console.log(results);
+                label = results[0].label;
+                confidence = results[0].confidence;
 
-            // 결과를 id가 'resultDisplay'인 요소에 출력
-            select('#resultDisplay').html(`Label: ${label}<br>Confidence: ${nf(confidence * 100, 0, 2)}%`);
-
-            // 서버로 결과 전송
-            sendResultToServer({ label, confidence });
+                // 결과를 id가 'resultDisplay'인 요소에 출력
+                select('#resultDisplay').html(`Label: ${label}<br>Confidence: ${nf(confidence * 100, 0, 2)}%`);
+                
+                classifyImage();
+                resultPrinted = true; // 결과를 출력한 후 플래그 설정
+            }
         }
     </script>
+
 </body>
 </html>
