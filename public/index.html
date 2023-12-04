@@ -8,7 +8,9 @@
 <body>
     <div>
         Teachable Machine Image Classifier
+        <!-- 파일 선택과 업로드 버튼 추가 -->
         <input type="file" id="imageUpload" accept="image/*" />
+        <button onclick="handleImage()">Upload Image</button>
     </div>
     <div id="resultDisplay"></div> <!-- 결과를 출력할 요소에 id 추가 -->
     <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
@@ -27,6 +29,7 @@
 
         function setup() {
             createCanvas(224, 224); // 이미지 크기 조정
+            // 이미지 업로드 이벤트 핸들러 설정
             let imageUpload = select('#imageUpload');
             imageUpload.changed(handleImage);
         }
@@ -39,6 +42,7 @@
             fill(0);
         }
 
+        // 이미지 업로드 및 분류 이벤트 핸들러
         function handleImage() {
             img = loadImage(URL.createObjectURL(select('#imageUpload').elt.files[0]), classifyImage);
         }
@@ -67,7 +71,6 @@
                 // 결과를 id가 'resultDisplay'인 요소에 출력
                 select('#resultDisplay').html(`Label: ${label}<br>Confidence: ${nf(confidence * 100, 0, 2)}%`);
                 
-                classifyImage();
                 resultPrinted = true; // 결과를 출력한 후 플래그 설정
             }
         }
