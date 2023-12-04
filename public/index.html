@@ -50,24 +50,17 @@
             }
         }
 
-        function sendImageToServer(img) {
-            // 이미지 데이터를 base64로 인코딩
-            const dataUrl = canvas.toDataURL();
-            const base64Img = dataUrl.split(',')[1];
-
-            // 이미지 데이터를 서버로 전송
-            const formData = new FormData();
-            formData.append('image', base64toBlob(base64Img), 'image.png');
-
-            fetch('http://localhost:5000/classify', {
+        function sendResultToServer(result) {
+            fetch('http://localhost:5000/process_result', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(result)
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data.result);
-                // 여기서 결과를 사용하거나 표시할 수 있습니다.
-                select('#resultDisplay').html(`Result from Server: ${data.result}`);
+                console.log(data);
             })
             .catch(error => console.error('Error:', error));
         }
@@ -84,21 +77,10 @@
 
             // 결과를 id가 'resultDisplay'인 요소에 출력
             select('#resultDisplay').html(`Label: ${label}<br>Confidence: ${nf(confidence * 100, 0, 2)}%`);
-            
-            // 서버로 이미지 전송
-            sendImageToServer(img);
-        }
 
-        // base64를 Blob으로 변환하는 함수
-        function base64toBlob(base64) {
-            const binary = atob(base64);
-            const array = [];
-            for (let i = 0; i < binary.length; i++) {
-                array.push(binary.charCodeAt(i));
-            }
-            return new Blob([new Uint8Array(array)], { type: 'image/png' });
+            // 서버로 결과 전송
+            sendResultToServer({ label, confidence });
         }
     </script>
 </body>
 </html>
-
