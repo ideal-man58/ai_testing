@@ -19,7 +19,7 @@
 
     <script type="text/javascript">
         let classifier;
-        let imageModelURL = './my_model/';
+        let imageModelURL = 'https://teachablemachine.withgoogle.com/models/EPOb0BwIo/';
         let img;
         let label = "";
 
@@ -29,9 +29,6 @@
 
         function setup() {
             createCanvas(224, 224); // 이미지 크기 조정
-            // 이미지 업로드 이벤트 핸들러 설정
-            let imageUpload = select('#imageUpload');
-            imageUpload.changed(handleImage);
         }
 
         function draw() {
@@ -44,7 +41,14 @@
 
         // 이미지 업로드 및 분류 이벤트 핸들러
         function handleImage() {
-            img = loadImage(URL.createObjectURL(select('#imageUpload').elt.files[0]), classifyImage);
+            let fileInput = document.getElementById('imageUpload');
+            let file = fileInput.files[0];
+            
+            if (file) {
+                img = loadImage(URL.createObjectURL(file), classifyImage);
+            } else {
+                console.error('No file selected');
+            }
         }
 
         function classifyImage() {
@@ -55,26 +59,19 @@
             }
         }
 
-        let resultPrinted = false; // 결과를 한 번만 출력하기 위한 플래그
-
         function gotResult(error, results) {
             if (error) {
                 console.error(error);
                 return;
             }
 
-            if (!resultPrinted) {
-                console.log(results);
-                label = results[0].label;
-                confidence = results[0].confidence;
+            console.log(results);
+            label = results[0].label;
+            confidence = results[0].confidence;
 
-                // 결과를 id가 'resultDisplay'인 요소에 출력
-                select('#resultDisplay').html(`Label: ${label}<br>Confidence: ${nf(confidence * 100, 0, 2)}%`);
-                
-                resultPrinted = true; // 결과를 출력한 후 플래그 설정
-            }
+            // 결과를 id가 'resultDisplay'인 요소에 출력
+            document.getElementById('resultDisplay').innerHTML = `Label: ${label}<br>Confidence: ${nf(confidence * 100, 0, 2)}%`;
         }
     </script>
-
 </body>
 </html>
